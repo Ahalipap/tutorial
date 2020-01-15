@@ -8,34 +8,20 @@ from tutorial import settings
 from tutorial.items import Net
 
 
-def get_codes():
-    host = settings.MONGODB_HOST
-    port = settings.MONGODB_PORT
-    dbname = settings.MONGODB_DBNAME
-
-    # 创建数据库连接
-    client = pymongo.MongoClient(host=host, port=port)
-
-    # 指向指定数据库
-    mdb = client[dbname]
-
-    # 获取数据库里面存放数据的表名
-    collections = mdb['fund_company']
-    res_list = []
-    for v in collections.find({}):
-        res_list.append(v.get('code'))
-    return res_list
-
-
-if __name__ == '__main__':
-    get_codes()
-
-
 class NetValueSpider(scrapy.Spider):
     name = 'net_value_spider'
 
-    def __init__(self):
+    def get_codes(self):
+        # 获取数据库里面存放数据的表名
+        collections = self.mdb['fund_company']
+        res_list = []
+        for v in collections.find({}):
+            res_list.append(v.get('code'))
+        return res_list
+
+    def __init__(self, **kwargs):
         # 获取setting主机名、端口号和数据库名称
+        super().__init__(**kwargs)
         self.host = settings.MONGODB_HOST
         self.port = settings.MONGODB_PORT
         self.dbname = settings.MONGODB_DBNAME
@@ -77,22 +63,3 @@ class NetValueSpider(scrapy.Spider):
         print('len====', item_list.__len__())
         # print(self.mdb['net_value'].insert_many(item_list))
         return items[0]
-
-
-"""
-class ScrapySpider(scrapy.Spider):
-    name = "scrapy_spider"
-    allowed_domains = ["httpbin.org"]
-
-    start_urls = (
-        "https://httpbin.org/get?show_env=1",
-    )
-    # 新加的代码
-    def start_requests(self):
-        for url in self.start_urls:
-            yield scrapy.Request(url, headers={"User-Agent": USER_AGENT})
-    # ------------
-
-    def parse(self, response):
-        print response.text
-"""
