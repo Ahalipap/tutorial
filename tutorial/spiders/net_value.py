@@ -5,7 +5,7 @@ import pymongo
 import scrapy
 
 from tutorial import settings
-from tutorial.items import FundCompanyItem, Net
+from tutorial.items import Net
 
 
 def get_codes():
@@ -34,6 +34,15 @@ if __name__ == '__main__':
 class NetValueSpider(scrapy.Spider):
     name = 'net_value_spider'
 
+    def __init__(self):
+        # 获取setting主机名、端口号和数据库名称
+        self.host = settings.MONGODB_HOST
+        self.port = settings.MONGODB_PORT
+        self.dbname = settings.MONGODB_DBNAME
+        # 创建数据库连接
+        self.client = pymongo.MongoClient(host=self.host, port=self.port)
+        # 指向指定数据库
+        self.mdb = self.client[self.dbname]
 
     # 重写start_requests方法
     def start_requests(self):
@@ -62,8 +71,12 @@ class NetValueSpider(scrapy.Spider):
             item['accumulated_net'] = v['LJJZ']  # 累计净值
             item['daily_growth_rate'] = v['JZZZL']  # 日增长率
             items.append(item)
-        print(len(items))
-        return items
+        item_list = [dict(v) for v in items]
+        for v in item_list:
+            self.mdb['net_value'].replace_one(filter=v, replacement=v, upsert=True)
+        print('len====', item_list.__len__())
+        # print(self.mdb['net_value'].insert_many(item_list))
+        return items[0]
 
 
 """

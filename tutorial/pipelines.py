@@ -8,6 +8,17 @@ import pymongo
 
 from tutorial import settings
 
+# 获取setting主机名、端口号和数据库名称
+host = settings.MONGODB_HOST
+port = settings.MONGODB_PORT
+dbname = settings.MONGODB_DBNAME
+# 创建数据库连接
+client = pymongo.MongoClient(host=host, port=port)
+# 指向指定数据库
+mdb = client[dbname]
+
+NetValueList = list()
+
 
 class TutorialPipeline(object):
     def process_item(self, item, spider):
@@ -17,17 +28,6 @@ class TutorialPipeline(object):
 class FundCompanyPipeline(object):
 
     def __init__(self):
-        # 获取setting主机名、端口号和数据库名称
-        host = settings.MONGODB_HOST
-        port = settings.MONGODB_PORT
-        dbname = settings.MONGODB_DBNAME
-
-        # 创建数据库连接
-        client = pymongo.MongoClient(host=host, port=port)
-
-        # 指向指定数据库
-        mdb = client[dbname]
-
         # 获取数据库里面存放数据的表名
         self.post = mdb['fund_company']
 
@@ -41,22 +41,15 @@ class FundCompanyPipeline(object):
 class NetValuePipeline(object):
 
     def __init__(self):
-        # 获取setting主机名、端口号和数据库名称
-        host = settings.MONGODB_HOST
-        port = settings.MONGODB_PORT
-        dbname = settings.MONGODB_DBNAME
-
-        # 创建数据库连接
-        client = pymongo.MongoClient(host=host, port=port)
-
-        # 指向指定数据库
-        mdb = client[dbname]
-
         # 获取数据库里面存放数据的表名
         self.post = mdb['net_value']
 
     def process_item(self, item, spider):
-        data = dict(item)
-        # 向指定的表里添加数据
-        self.post.replace_one(replacement=data, filter=data, upsert=True)
-        return item
+        # data = dict(item)
+        # NetValueList.append(data)
+        # if NetValueList.__len__() >= 5000:
+        #     # 向指定的表里添加数据
+        #     print('insert many')
+        #     self.post.insert_many(documents=NetValueList, ordered=False)
+        #     NetValueList.clear()
+        return len(NetValueList)
