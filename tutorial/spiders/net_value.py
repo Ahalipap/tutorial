@@ -32,7 +32,7 @@ class NetValueSpider(scrapy.Spider):
 
     # 重写start_requests方法
     def start_requests(self):
-        code_list = get_codes()
+        code_list = self.get_codes()
         headers = {
             'Referer': 'http://fundf10.eastmoney.com/'
         }
@@ -57,9 +57,9 @@ class NetValueSpider(scrapy.Spider):
             item['accumulated_net'] = v['LJJZ']  # 累计净值
             item['daily_growth_rate'] = v['JZZZL']  # 日增长率
             items.append(item)
-        item_list = [dict(v) for v in items]
-        for v in item_list:
-            self.mdb['net_value'].replace_one(filter=v, replacement=v, upsert=True)
-        print('len====', item_list.__len__())
+        # item_list = [dict(v) for v in items]
+        # for v in item_list:
+        #     self.mdb['net_value'].replace_one(filter=v, replacement=v, upsert=True)
+        print('len====', items.__len__())
         # print(self.mdb['net_value'].insert_many(item_list))
-        return items[0]
+        return items

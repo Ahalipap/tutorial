@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # scheduler.start()
     # job_fund_company_spider()
     # cmdline.execute("scrapy crawl fund_company_spider".split())
-    cmdline.execute("scrapy crawl net_value_spider  --nolog".split())
-    if NetValueList.__len__() != 0:
-        NetValuePipeline.post.insert_many(documents=NetValueList)
-        print('success')
+    cmdline.execute("scrapy crawl net_value_spider --nolog".split())
+    # if NetValueList.__len__() != 0:
+    #     NetValuePipeline.post.insert_many(documents=NetValueList)
+    #     print('success')
